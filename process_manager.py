@@ -1,68 +1,71 @@
 import subprocess
 import time
+import requests
 import signal
 import os
 
-# Paths to your scripts
-API_SCRIPT = 'api.py'
-MAINSETUP_SCRIPT = 'mainsetup.py'
+# Define global variables for the process
+process = None
 
-# Global variables to store process handles
-api_process = None
-mainsetup_process = None
+def start_mainsetup():
+    global process
+    if process is not None:
+        print("Mainsetup is already running.")
+        return
 
-def start_processes():
-    global api_process, mainsetup_process
+    process = subprocess.Popen(['python3', 'mainsetup.py'])
+    print("Mainsetup started.")
 
-    if api_process is None or mainsetup_process is None:
-        print("Starting API...")
-        api_process = subprocess.Popen(['python3', API_SCRIPT], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        
-        print("Waiting for API to start...")
-        time.sleep(5)  # Wait for a few seconds for the API to start
+def stop_mainsetup():
+    global process
+    if process is None:
+        print("Mainsetup is not running.")
+        return
 
-        print("Starting mainsetup.py...")
-        mainsetup_process = subprocess.Popen(['python3', MAINSETUP_SCRIPT], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process.terminate()
+    process.wait()
+    process = None
+    print("Mainsetup stopped.")
 
-        print("Both processes started.")
+def restart_mainsetup():
+    stop_mainsetup()
+    time.sleep(1)  # Give it a moment to ensure it has stopped
+    start_mainsetup()
+    print("Mainsetup restarted.")
 
-def stop_processes():
-    global api_process, mainsetup_process
+def check_api_status(api_url):
+    try:
+        response = requests.get(f"{api_url}/status")
+        return response.json().get('status') == 'online'
+    except requests.RequestException as e:
+        print(f"API request failed: {e}")
+        return False
 
-    if api_process is not None:
-        print("Stopping API...")
-        api_process.send_signal(signal.SIGTERM)
-        api_process.wait()
-        api_process = None
+def main(api_url):
+    global process
 
-    if mainsetup_process is not None:
-        print("Stopping mainsetup.py...")
-        mainsetup_process.send_signal(signal.SIGTERM)
-        mainsetup_process.wait()
-        mainsetup_process = None
+    if not check_api_status(api_url):
+        print("API is not available. Exiting.")
+        return
 
-    print("Both processes stopped.")
+    while True:
+        try:
+            response = requests.get(f"{api_url}/get_command")
+            command = response.json().get('command')
 
-def restart_processes():
-    print("Restarting processes...")
-    stop_processes()
-    time.sleep(2)  # Give some time for processes to shut down
-    start_processes()
+            if command == 'start':
+                start_mainsetup()
+            elif command == 'stop':
+                stop_mainsetup()
+            elif command == 'restart':
+                restart_mainsetup()
+            
+            time.sleep(5)  # Wait before checking for new commands
 
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Manage API and mainsetup processes.')
-    parser.add_argument('command', choices=['start', 'stop', 'restart'], help='Command to run')
-    
-    args = parser.parse_args()
-    
-    if args.command == 'start':
-        start_processes()
-    elif args.command == 'stop':
-        stop_processes()
-    elif args.command == 'restart':
-        restart_processes()
+        except requests.RequestException as e:
+            print(f"Failed to fetch command from API: {e}")
+            time.sleep(10)  # Wait before retrying
 
 if __name__ == '__main__':
-    main()
+    API_URL = 'http://127.0.0.1:5001'  # Change this to your actual API URL if necessary
+    main(API_URL)
