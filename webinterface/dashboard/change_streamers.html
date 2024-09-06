@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Change Streamers</title>
+  <link rel='stylesheet' href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+  <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/animate.css/3.2.3/animate.min.css'>
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    .streamer-form {
+      margin-top: 20px;
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    }
+    .streamer-form input {
+      margin-bottom: 15px;
+    }
+    .current-streamers {
+      background-color: #e9ecef;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+    .btn-submit {
+      background-color: #5cb85c;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">The Doom Eye Control Panel</a>
+    </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#"><span class="glyphicon glyphicon-user">&nbsp;</span>The Doom Eye User</a></li>
+        <li><a href="#">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container-fluid">
+  <div class="col-md-3">
+    <div id="sidebar">
+      <div class="container-fluid tmargin">
+        <div class="input-group">
+          <span class="input-group-btn">
+          </span>
+        </div>
+      </div>
+      <ul class="nav navbar-nav side-bar">
+        <li class="side-bar tmargin"><a href="index.html"><span class="glyphicon glyphicon-list">&nbsp;</span>Dashboard</a></li>
+        <li class="side-bar"><a href="change_streamers.html"><span class="glyphicon glyphicon-flag">&nbsp;</span>Change Streamers</a></li>
+        <li class="side-bar"><a href="process.html"><span class="glyphicon glyphicon-cog">&nbsp;</span>Process</a></li>
+        <li class="side-bar"><a href="#"><span class="glyphicon glyphicon-certificate">&nbsp;</span>Officials</a></li>
+        <li class="side-bar"><a href="#"><span class="glyphicon glyphicon-signal">&nbsp;</span>Statistics</a></li>
+        <li class="side-bar"><a href="#"><span class="glyphicon glyphicon-cog">&nbsp;</span>Settings</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-9 animated bounce">
+    <h1 class="page-header">Change Streamers</h1>
+    <form id="streamerForm" class="streamer-form">
+      <div class="row">
+        <div class="col-md-6">
+          <h3>Current Streamers</h3>
+          <!-- Non-editable fields for current streamers -->
+          <div class="form-group">
+            <input type="text" class="form-control current-streamers" id="currentStreamer1" readonly>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control current-streamers" id="currentStreamer2" readonly>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control current-streamers" id="currentStreamer3" readonly>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control current-streamers" id="currentStreamer4" readonly>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control current-streamers" id="currentStreamer5" readonly>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h3>New Streamers</h3>
+          <!-- Editable fields for new streamers -->
+          <div class="form-group">
+            <input type="text" class="form-control" id="newStreamer1" placeholder="Enter new streamer 1">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="newStreamer2" placeholder="Enter new streamer 2">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="newStreamer3" placeholder="Enter new streamer 3">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="newStreamer4" placeholder="Enter new streamer 4">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="newStreamer5" placeholder="Enter new streamer 5">
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-submit" onclick="updateStreamers()">Update Streamers</button>
+    </form>
+  </div>
+</div>
+
+<script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+<script>
+  // Fetch current streamers from the API
+  function fetchCurrentStreamers() {
+    fetch('http://127.0.0.1:5001/get_streamers')
+      .then(response => response.json())
+      .then(data => {
+        const streamers = data.streamers || [];
+        document.getElementById('currentStreamer1').value = streamers[0] || '';
+        document.getElementById('currentStreamer2').value = streamers[1] || '';
+        document.getElementById('currentStreamer3').value = streamers[2] || '';
+        document.getElementById('currentStreamer4').value = streamers[3] || '';
+        document.getElementById('currentStreamer5').value = streamers[4] || '';
+      })
+      .catch(error => console.error('Error fetching current streamers:', error));
+  }
+
+  // Update streamers by sending data to the API
+  function updateStreamers() {
+    const newStreamers = [
+      document.getElementById('newStreamer1').value,
+      document.getElementById('newStreamer2').value,
+      document.getElementById('newStreamer3').value,
+      document.getElementById('newStreamer4').value,
+      document.getElementById('newStreamer5').value
+    ].filter(streamer => streamer.trim() !== ''); // Filter out empty streamers
+
+    fetch('http://127.0.0.1:5001/update_streamers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ streamers: newStreamers })
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert('Streamers updated successfully!');
+      fetchCurrentStreamers(); // Refresh the current streamers list
+    })
+    .catch(error => console.error('Error updating streamers:', error));
+  }
+
+  // Initial fetch of current streamers
+  fetchCurrentStreamers();
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Doom Eye</title>
+  <link href="https://fonts.googleapis.com/css?family=Tomorrow:400,500,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="container">
+    <h1>Sign in</h1>
+    <form id="loginForm">
+      <div class="editor-field editor-field__textbox">
+        <div class="editor-field__label-container">
+          <label class="editor-field__label">Name</label>
+        </div>
+        <div class="editor-field__container">
+          <input type="text" id="username" class="editor-field__input" onfocus="generateNoise(this, 'input')"
+            onblur="removeNoise(this, 'input')" required />
+        </div>
+        <span class="editor-field__bottom"></span>
+        <div class="editor-field__noise"></div>
+      </div>
+      <div class="editor-field editor-field__textbox">
+        <div class="editor-field__label-container">
+          <label class="editor-field__label">Password</label>
+        </div>
+        <div class="editor-field__container">
+          <input type="password" id="password" class="editor-field__input" onfocus="generateNoise(this, 'input')"
+            onblur="removeNoise(this, 'input')" required />
+        </div>
+        <span class="editor-field__bottom"></span>
+        <div class="editor-field__noise"></div>
+      </div>
+      <button type="submit" class="btn btn--primary" onmouseover="generateNoise(this, 'button')"
+        onmouseout="removeNoise(this, 'button')">
+        <div class="btn__container">
+          Login
+        </div>
+        <div class="btn__bottom"></div>
+        <div class="btn__noise"></div>
+      </button>
+    </form>
+</div>
+<script src="./script.js"></script>
+</body>
+</html>
